@@ -19,6 +19,7 @@ package org.apache.flink.statefun.examples.shoppingcart;
 
 import org.apache.flink.statefun.examples.shoppingcart.generated.ProtobufMessages;
 import org.apache.flink.statefun.sdk.Context;
+import org.apache.flink.statefun.sdk.FunctionType;
 import org.apache.flink.statefun.sdk.StatefulFunction;
 import org.apache.flink.statefun.sdk.annotations.Persisted;
 import org.apache.flink.statefun.sdk.state.PersistedValue;
@@ -28,6 +29,8 @@ import java.util.logging.Logger;
 import java.util.logging.FileHandler;
 
 final class Inventory implements StatefulFunction {
+  static final FunctionType TYPE = new FunctionType(Identifiers.NAMESPACE, "inventory");
+
   private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   @Persisted
@@ -43,12 +46,12 @@ final class Inventory implements StatefulFunction {
     }
 
     LOGGER.addHandler(fileTxt);
-    LOGGER.info("reached inventory start");
     if (message instanceof ProtobufMessages.RestockItem) {
 
       int quantity =
           inventory.getOrDefault(0) + ((ProtobufMessages.RestockItem) message).getQuantity();
       inventory.set(quantity);
+      System.out.println(String.format("Inventory: within restock item: message and value: %s %d", ((ProtobufMessages.RestockItem) message).toString(), inventory.get()));
     } else if (message instanceof ProtobufMessages.RequestItem) {
       int quantity = inventory.getOrDefault(0);
       int requestedAmount = ((ProtobufMessages.RequestItem) message).getQuantity();
@@ -62,7 +65,7 @@ final class Inventory implements StatefulFunction {
       } else {
         availability.setStatus(ProtobufMessages.ItemAvailability.Status.OUTOFSTOCK);
       }
-
+      System.out.println(String.format("Inventory: within request item: message and value: %s %d", ((ProtobufMessages.RequestItem) message).toString(), inventory.get()));
       context.send(context.caller(), availability.build());
     }
   }

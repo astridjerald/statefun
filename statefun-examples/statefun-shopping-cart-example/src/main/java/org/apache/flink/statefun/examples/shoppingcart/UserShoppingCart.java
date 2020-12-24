@@ -23,11 +23,13 @@ import java.util.stream.StreamSupport;
 import org.apache.flink.statefun.examples.shoppingcart.generated.ProtobufMessages;
 import org.apache.flink.statefun.sdk.Address;
 import org.apache.flink.statefun.sdk.Context;
+import org.apache.flink.statefun.sdk.FunctionType;
 import org.apache.flink.statefun.sdk.StatefulFunction;
 import org.apache.flink.statefun.sdk.annotations.Persisted;
 import org.apache.flink.statefun.sdk.state.PersistedTable;
 
 final class UserShoppingCart implements StatefulFunction {
+  static final FunctionType TYPE = new FunctionType(Identifiers.NAMESPACE, "user");
 
   @Persisted
   private final PersistedTable<String, Integer> userBasket =
@@ -39,7 +41,7 @@ final class UserShoppingCart implements StatefulFunction {
       ProtobufMessages.AddToCart addToCart = (ProtobufMessages.AddToCart) input;
       ProtobufMessages.RequestItem request =
           ProtobufMessages.RequestItem.newBuilder().setQuantity(addToCart.getQuantity()).build();
-      Address address = new Address(Identifiers.INVENTORY, addToCart.getItemId());
+      Address address = new Address(Inventory.TYPE, addToCart.getItemId());
       context.send(address, request);
     }
 
@@ -48,6 +50,10 @@ final class UserShoppingCart implements StatefulFunction {
 
       if (availability.getStatus() == ProtobufMessages.ItemAvailability.Status.INSTOCK) {
         userBasket.set(context.caller().id(), availability.getQuantity());
+      }
+      System.out.println(String.format("User: Item availability %s: The latest user basket is:", availability.toString()));
+      for (Map.Entry<String, Integer> entry : userBasket.entries()) {
+        System.out.println(String.format("Item: %s Value: %d", entry.getKey(), entry.getValue()));
       }
     }
 
@@ -59,11 +65,16 @@ final class UserShoppingCart implements StatefulFunction {
                 .setQuantity(entry.getValue())
                 .build();
 
-        Address address = new Address(Identifiers.INVENTORY, entry.getKey());
+        Address address = new Address(Inventory.TYPE, entry.getKey());
         context.send(address, item);
       }
 
       userBasket.clear();
+      System.out.println("User: Cart cleared! The user basket is:");
+      for (Map.Entry<String, Integer> entry : userBasket.entries()) {
+        System.out.println(String.format("Item: %s Value: %d", entry.getKey(), entry.getValue()));
+      }
+
     }
 
     if (input instanceof ProtobufMessages.Checkout) {
@@ -81,6 +92,11 @@ final class UserShoppingCart implements StatefulFunction {
 
       context.send(Identifiers.RECEIPT, receipt);
       userBasket.clear();
+      System.out.println("User: Cart checked out! The user basket is");
+      for (Map.Entry<String, Integer> entry : userBasket.entries()) {
+        System.out.println(String.format("Item: %s Value: %d", entry.getKey(), entry.getValue()));
+      }
+
     }
   }
 }

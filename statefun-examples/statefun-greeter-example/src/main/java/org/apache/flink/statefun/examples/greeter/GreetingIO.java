@@ -112,7 +112,7 @@ action).build();
     String[] data = new String(input.value(), StandardCharsets.UTF_8).split(" ");
     String who = data[0];
     String action = data[1];
-    return CustomerRequest.newBuilder().setWho(who).setAction(
+    return CustomerRequest.newBuilder().setWho(who).setAction()
 
   private static final class GreetKafkaSerializer implements KafkaEgressSerializer<GreetResponse> {
 

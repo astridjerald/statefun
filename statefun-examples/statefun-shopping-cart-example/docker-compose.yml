@@ -45,6 +45,7 @@ services:
       - MASTER_HOST=master
     volumes:
       - ./checkpoint-dir:/checkpoint-dir
+      - ./target/statefun-shopping-cart-example.jar:/opt/statefun/modules/statefun-shopping-cart-example/statefun-shopping-cart-example.jar
   worker:
     build:
       context: .
@@ -62,4 +63,6 @@ services:
       - MASTER_HOST=master
     volumes:
       - ./checkpoint-dir:/checkpoint-dir
+      - ./target/statefun-shopping-cart-example.jar:/opt/statefun/modules/statefun-shopping-cart-example/statefun-shopping-cart-example.jar
+
 

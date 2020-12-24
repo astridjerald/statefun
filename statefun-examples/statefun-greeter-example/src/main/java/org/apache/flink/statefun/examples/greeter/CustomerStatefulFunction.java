@@ -49,7 +49,7 @@ final class CustomerStatefulFunction implements StatefulFunction {
    * greeted.
    */
   @Persisted
-  private final PersistedValue<HashSet> seenCount = PersistedValue.of("seen-count", HashSet.class);
+  private final PersistedValue<Integer> seenCount = PersistedValue.of("seen-count", Integer.class);
 
   @Override
   public void invoke(Context context, Object input) {

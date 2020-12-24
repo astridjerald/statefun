@@ -25,6 +25,6 @@ final class RestockItemRouter implements Router<ProtobufMessages.RestockItem> {
   public void route(
       ProtobufMessages.RestockItem message, Downstream<ProtobufMessages.RestockItem> downstream) {
 
-    downstream.forward(Identifiers.INVENTORY, message.getItemId(), message);
+    downstream.forward(Inventory.TYPE, message.getItemId(), message);
   }
 }

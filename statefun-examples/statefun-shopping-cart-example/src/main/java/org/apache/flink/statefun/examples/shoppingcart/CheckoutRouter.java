@@ -7,6 +7,6 @@ public class CheckoutRouter implements Router<ProtobufMessages.Checkout> {
 
     @Override
     public void route(ProtobufMessages.Checkout message, Downstream<ProtobufMessages.Checkout> downstream) {
-        downstream.forward(Identifiers.USER, message.getUserId(), message);
+        downstream.forward(UserShoppingCart.TYPE, message.getUserId(), message);
     }
 }

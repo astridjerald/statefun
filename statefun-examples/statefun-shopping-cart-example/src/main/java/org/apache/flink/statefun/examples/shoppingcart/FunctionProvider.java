@@ -7,10 +7,10 @@ import org.apache.flink.statefun.sdk.StatefulFunctionProvider;
 public class FunctionProvider implements StatefulFunctionProvider {
     @Override
     public StatefulFunction functionOfType(FunctionType functionType) {
-        if (functionType.equals(Identifiers.INVENTORY)){
+        if (functionType.equals(Inventory.TYPE)){
             return new Inventory();
         }
-        else if (functionType.equals(Identifiers.USER)){
+        else if (functionType.equals(UserShoppingCart.TYPE)){
             return new UserShoppingCart();
         }
         else {

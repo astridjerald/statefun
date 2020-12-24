@@ -26,9 +26,11 @@ final class Identifiers {
 
   private Identifiers() {}
 
-  static final FunctionType USER = new FunctionType("shopping-cart", "user");
+  static final String NAMESPACE = "org.apache.flink.statefun.examples.shoppingcart";
 
-  static final FunctionType INVENTORY = new FunctionType("shopping-cart", "inventory");
+//  static final FunctionType USER = new FunctionType("shopping-cart", "user");
+//
+//  static final FunctionType INVENTORY = new FunctionType("shopping-cart", "inventory");
 
   static final IngressIdentifier<ProtobufMessages.AddToCart> ADD_TO_CART =
           new IngressIdentifier<>(ProtobufMessages.AddToCart.class, "shopping-cart", "add-to-cart");

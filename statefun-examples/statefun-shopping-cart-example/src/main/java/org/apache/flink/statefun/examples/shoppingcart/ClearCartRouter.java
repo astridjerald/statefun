@@ -7,6 +7,6 @@ public class ClearCartRouter implements Router<ProtobufMessages.ClearCart> {
 
     @Override
     public void route(ProtobufMessages.ClearCart message, Downstream<ProtobufMessages.ClearCart> downstream) {
-        downstream.forward(Identifiers.USER, message.getUserId(), message);
+        downstream.forward(UserShoppingCart.TYPE, message.getUserId(), message);
     }
 }

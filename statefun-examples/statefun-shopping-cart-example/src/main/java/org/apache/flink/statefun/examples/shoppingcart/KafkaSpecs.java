@@ -110,8 +110,8 @@ final class KafkaSpecs {
         @Override
         public ProtobufMessages.RestockItem deserialize(ConsumerRecord<byte[], byte[]> input) {
             String[] data = new String(input.value(), StandardCharsets.UTF_8).split(" ");
-            String itemId = data[1];
-            int quantity = Integer.parseInt(data[2]);
+            String itemId = data[0];
+            int quantity = Integer.parseInt(data[1]);
             return ProtobufMessages.RestockItem.newBuilder().setItemId(itemId).setQuantity(quantity).build();
         }
         }

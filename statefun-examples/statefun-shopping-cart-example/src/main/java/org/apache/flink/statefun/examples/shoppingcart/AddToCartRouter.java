@@ -7,6 +7,6 @@ public class AddToCartRouter implements Router<ProtobufMessages.AddToCart> {
 
     @Override
     public void route(ProtobufMessages.AddToCart message, Downstream<ProtobufMessages.AddToCart> downstream) {
-        downstream.forward(Identifiers.USER, message.getUserId(), message);
+        downstream.forward(UserShoppingCart.TYPE, message.getUserId(), message);
     }
 }

@@ -34,8 +34,8 @@ public class ShoppingCartModule implements StatefulFunctionModule {
     // bind functions
     FunctionProvider provider = new FunctionProvider();
 
-    binder.bindFunctionProvider(Identifiers.USER, provider);
-    binder.bindFunctionProvider(Identifiers.INVENTORY, provider);
+    binder.bindFunctionProvider(UserShoppingCart.TYPE, provider);
+    binder.bindFunctionProvider(Inventory.TYPE, provider);
 
     binder.bindIngress(KafkaSpecs.ADD_TO_CART_SPEC);
     binder.bindIngressRouter(Identifiers.ADD_TO_CART, new AddToCartRouter());
