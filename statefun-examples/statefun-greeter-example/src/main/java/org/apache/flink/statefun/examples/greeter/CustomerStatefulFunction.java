@@ -25,11 +25,13 @@ import org.apache.flink.statefun.sdk.StatefulFunction;
 import org.apache.flink.statefun.sdk.annotations.Persisted;
 import org.apache.flink.statefun.sdk.state.PersistedValue;
 
+import java.util.HashSet;
+
 /**
  * A stateful function that generates a unique greeting for each user based on how many times that
  * user has been seen by the system.
  */
-final class GreetStatefulFunction implements StatefulFunction {
+final class CustomerStatefulFunction implements StatefulFunction {
 
   /**
    * The function type is the unique identifier that identifies this type of function. The type, in
@@ -39,7 +41,7 @@ final class GreetStatefulFunction implements StatefulFunction {
    * <p>If this was a multi-module application, the function type could be in different package so
    * functions in other modules could message the greeter without a direct dependency on this class.
    */
-  static final FunctionType TYPE = new FunctionType("apache", "greeter");
+  static final FunctionType TYPE = new FunctionType("apache", "customer");
 
   /**
    * The persisted value for maintaining state about a particular user. The value returned by this
@@ -47,7 +49,7 @@ final class GreetStatefulFunction implements StatefulFunction {
    * greeted.
    */
   @Persisted
-  private final PersistedValue<Integer> seenCount = PersistedValue.of("seen-count", Integer.class);
+  private final PersistedValue<HashSet> seenCount = PersistedValue.of("seen-count", HashSet.class);
 
   @Override
   public void invoke(Context context, Object input) {

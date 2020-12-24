@@ -15,15 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.flink.statefun.examples.shoppingcart;
+package org.apache.flink.statefun.examples.greeter;
 
-import org.apache.flink.statefun.examples.shoppingcart.generated.ProtobufMessages;
+import org.apache.flink.statefun.examples.greeter.generated.GreetRequest;
 import org.apache.flink.statefun.sdk.io.Router;
 
-final class RestockRouter implements Router<ProtobufMessages.RestockItem> {
+/**
+ * The greet router takes each message from an ingress and routes it to a greeter function based on
+ * the users id.
+ */
+final class CustomerRouter implements Router<GreetRequest> {
+
   @Override
-  public void route(
-      ProtobufMessages.RestockItem message, Downstream<ProtobufMessages.RestockItem> downstream) {
-    downstream.forward(Identifiers.INVENTORY, message.getItemId(), message);
+  public void route(GreetRequest message, Downstream<GreetRequest> downstream) {
+    downstream.forward(CustomerStatefulFunction.TYPE, message.getWho(), message);
   }
 }

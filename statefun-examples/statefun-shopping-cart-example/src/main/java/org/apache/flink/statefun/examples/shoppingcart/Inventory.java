@@ -23,14 +23,29 @@ import org.apache.flink.statefun.sdk.StatefulFunction;
 import org.apache.flink.statefun.sdk.annotations.Persisted;
 import org.apache.flink.statefun.sdk.state.PersistedValue;
 
+import java.io.IOException;
+import java.util.logging.Logger;
+import java.util.logging.FileHandler;
+
 final class Inventory implements StatefulFunction {
+  private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   @Persisted
   private final PersistedValue<Integer> inventory = PersistedValue.of("inventory", Integer.class);
 
   @Override
   public void invoke(Context context, Object message) {
+    FileHandler fileTxt = null;
+    try {
+      fileTxt = new FileHandler("Logging.txt");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    LOGGER.addHandler(fileTxt);
+    LOGGER.info("reached inventory start");
     if (message instanceof ProtobufMessages.RestockItem) {
+
       int quantity =
           inventory.getOrDefault(0) + ((ProtobufMessages.RestockItem) message).getQuantity();
       inventory.set(quantity);

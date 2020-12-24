@@ -30,7 +30,14 @@ final class Identifiers {
 
   static final FunctionType INVENTORY = new FunctionType("shopping-cart", "inventory");
 
-  static final IngressIdentifier<ProtobufMessages.RestockItem> RESTOCK =
+  static final IngressIdentifier<ProtobufMessages.AddToCart> ADD_TO_CART =
+          new IngressIdentifier<>(ProtobufMessages.AddToCart.class, "shopping-cart", "add-to-cart");
+  static final IngressIdentifier<ProtobufMessages.ClearCart> CLEAR_CART =
+          new IngressIdentifier<>(ProtobufMessages.ClearCart.class, "shopping-cart", "clear-cart");
+  static final IngressIdentifier<ProtobufMessages.Checkout> CHECKOUT =
+          new IngressIdentifier<>(ProtobufMessages.Checkout.class, "shopping-cart", "checkout");
+
+  static final IngressIdentifier<ProtobufMessages.RestockItem> RESTOCK_ITEM =
       new IngressIdentifier<>(ProtobufMessages.RestockItem.class, "shopping-cart", "restock-item");
 
   static final EgressIdentifier<ProtobufMessages.Receipt> RECEIPT =

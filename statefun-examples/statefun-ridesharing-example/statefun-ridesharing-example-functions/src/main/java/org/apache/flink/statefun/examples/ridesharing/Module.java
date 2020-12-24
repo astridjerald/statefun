@@ -26,6 +26,7 @@ public class Module implements StatefulFunctionModule {
 
   @Override
   public void configure(Map<String, String> globalConfiguration, Binder binder) {
+
     FunctionProvider provider = new FunctionProvider();
     binder.bindFunctionProvider(FnPassenger.TYPE, provider);
     binder.bindFunctionProvider(FnDriver.TYPE, provider);

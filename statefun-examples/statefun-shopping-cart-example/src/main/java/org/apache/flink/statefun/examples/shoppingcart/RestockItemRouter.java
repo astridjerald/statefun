@@ -15,25 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-syntax = "proto3";
+package org.apache.flink.statefun.examples.shoppingcart;
 
-package org.apache.flink.statefun.examples.kafka;
-option java_package = "org.apache.flink.statefun.examples.greeter.generated";
-option java_multiple_files = true;
+import org.apache.flink.statefun.examples.shoppingcart.generated.ProtobufMessages;
+import org.apache.flink.statefun.sdk.io.Router;
 
-message GreetRequest {
-    string who = 1;
-    string action = 2;
+final class RestockItemRouter implements Router<ProtobufMessages.RestockItem> {
+  @Override
+  public void route(
+      ProtobufMessages.RestockItem message, Downstream<ProtobufMessages.RestockItem> downstream) {
+
+    downstream.forward(Identifiers.INVENTORY, message.getItemId(), message);
+  }
 }
-
-message GreetResponse {
-    string who = 1;
-    string greeting = 2;
-}
-
-message CustomerRequest {
-    string who = 1;
-    string action = 2;
-}
-
-

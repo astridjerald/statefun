@@ -25,27 +25,31 @@ import org.apache.flink.statefun.sdk.io.IngressSpec;
 import org.apache.flink.statefun.sdk.kafka.KafkaEgressBuilder;
 import org.apache.flink.statefun.sdk.kafka.KafkaIngressBuilder;
 import org.apache.flink.statefun.sdk.spi.StatefulFunctionModule;
+import java.util.logging.Logger;
 
 @AutoService(StatefulFunctionModule.class)
 public class ShoppingCartModule implements StatefulFunctionModule {
   @Override
   public void configure(Map<String, String> globalConfiguration, Binder binder) {
     // bind functions
-    binder.bindFunctionProvider(Identifiers.USER, unused -> new UserShoppingCart());
-    binder.bindFunctionProvider(Identifiers.INVENTORY, unused -> new Inventory());
+    FunctionProvider provider = new FunctionProvider();
 
-    // For ingress and egress pretend I filled in the details :)
+    binder.bindFunctionProvider(Identifiers.USER, provider);
+    binder.bindFunctionProvider(Identifiers.INVENTORY, provider);
 
-    IngressSpec<ProtobufMessages.RestockItem> restockSpec =
-        KafkaIngressBuilder.forIdentifier(Identifiers.RESTOCK).build();
+    binder.bindIngress(KafkaSpecs.ADD_TO_CART_SPEC);
+    binder.bindIngressRouter(Identifiers.ADD_TO_CART, new AddToCartRouter());
 
-    binder.bindIngress(restockSpec);
+    binder.bindIngress(KafkaSpecs.CLEAR_CART_SPEC);
+    binder.bindIngressRouter(Identifiers.CLEAR_CART, new ClearCartRouter());
 
-    binder.bindIngressRouter(Identifiers.RESTOCK, new RestockRouter());
+    binder.bindIngress(KafkaSpecs.CHECKOUT_SPEC);
+    binder.bindIngressRouter(Identifiers.CHECKOUT, new CheckoutRouter());
 
-    EgressSpec<ProtobufMessages.Receipt> receiptSpec =
-        KafkaEgressBuilder.forIdentifier(Identifiers.RECEIPT).build();
+    binder.bindIngress(KafkaSpecs.RESTOCK_ITEM_SPEC);
+    binder.bindIngressRouter(Identifiers.RESTOCK_ITEM, new RestockItemRouter());
 
-    binder.bindEgress(receiptSpec);
+    binder.bindEgress(KafkaSpecs.RECEIPT_SPEC);
+
   }
 }

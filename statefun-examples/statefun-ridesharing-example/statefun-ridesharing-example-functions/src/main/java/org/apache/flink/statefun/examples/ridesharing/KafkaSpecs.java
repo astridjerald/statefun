@@ -18,7 +18,6 @@
 package org.apache.flink.statefun.examples.ridesharing;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import java.nio.charset.StandardCharsets;
 import org.apache.flink.statefun.examples.ridesharing.generated.InboundDriverMessage;
 import org.apache.flink.statefun.examples.ridesharing.generated.InboundPassengerMessage;
 import org.apache.flink.statefun.examples.ridesharing.generated.OutboundDriverMessage;
@@ -33,95 +32,97 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import java.nio.charset.StandardCharsets;
+
 final class KafkaSpecs {
 
-  private static final String KAFKA_SERVER = "kafka-broker:9092";
-  private static final String TO_PASSENGER_KAFKA_TOPIC_NAME = "to-passenger";
-  private static final String TO_DRIVER_TOPIC_NAME = "to-driver";
-  private static final String FROM_DRIVER_TOPIC_NAME = "from-driver";
-  private static final String FROM_PASSENGER_TOPIC_NAME = "from-passenger";
+    private static final String KAFKA_SERVER = "kafka-broker:9092";
+    private static final String TO_PASSENGER_KAFKA_TOPIC_NAME = "to-passenger";
+    private static final String TO_DRIVER_TOPIC_NAME = "to-driver";
+    private static final String FROM_DRIVER_TOPIC_NAME = "from-driver";
+    private static final String FROM_PASSENGER_TOPIC_NAME = "from-passenger";
 
-  static IngressSpec<InboundDriverMessage> FROM_DRIVER_SPEC =
-      KafkaIngressBuilder.forIdentifier(Identifiers.FROM_DRIVER)
-          .withKafkaAddress(KAFKA_SERVER)
-          .withTopic(FROM_DRIVER_TOPIC_NAME)
-          .withProperty(ConsumerConfig.GROUP_ID_CONFIG, "statefun-from-driver-group")
-          .withDeserializer(FromDriverDeserializer.class)
-          .build();
+    static IngressSpec<InboundDriverMessage> FROM_DRIVER_SPEC =
+        KafkaIngressBuilder.forIdentifier(Identifiers.FROM_DRIVER)
+            .withKafkaAddress(KAFKA_SERVER)
+            .withTopic(FROM_DRIVER_TOPIC_NAME)
+            .withProperty(ConsumerConfig.GROUP_ID_CONFIG, "statefun-from-driver-group ")
+            .withDeserializer(FromDriverDeserializer.class)
+            .build();
 
-  static IngressSpec<InboundPassengerMessage> FROM_PASSENGER_SPEC =
-      KafkaIngressBuilder.forIdentifier(Identifiers.FROM_PASSENGERS)
-          .withKafkaAddress(KAFKA_SERVER)
-          .withTopic(FROM_PASSENGER_TOPIC_NAME)
-          .withProperty(ConsumerConfig.GROUP_ID_CONFIG, "statefun-from-passenger-group")
-          .withDeserializer(FromPassengersDeserializer.class)
-          .build();
+    static IngressSpec<InboundPassengerMessage> FROM_PASSENGER_SPEC =
+        KafkaIngressBuilder.forIdentifier(Identifiers.FROM_PASSENGERS)
+            .withKafkaAddress(KAFKA_SERVER)
+            .withTopic(FROM_PASSENGER_TOPIC_NAME)
+            .withProperty(ConsumerConfig.GROUP_ID_CONFIG, "statefun-from-passenger-group")
+            .withDeserializer(FromPassengersDeserializer.class)
+            .build();
 
-  static EgressSpec<OutboundPassengerMessage> TO_PASSENGER_SPEC =
-      KafkaEgressBuilder.forIdentifier(Identifiers.TO_PASSENGER_EGRESS)
-          .withKafkaAddress(KAFKA_SERVER)
-          .withSerializer(ToPassengersSerializer.class)
-          .build();
+    static EgressSpec<OutboundPassengerMessage> TO_PASSENGER_SPEC =
+        KafkaEgressBuilder.forIdentifier(Identifiers.TO_PASSENGER_EGRESS)
+            .withKafkaAddress(KAFKA_SERVER)
+            .withSerializer(ToPassengersSerializer.class)
+            .build();
 
-  static EgressSpec<OutboundDriverMessage> TO_DRIVER_SPEC =
-      KafkaEgressBuilder.forIdentifier(Identifiers.TO_OUTBOUND_DRIVER)
-          .withKafkaAddress(KAFKA_SERVER)
-          .withSerializer(ToDriverSerializer.class)
-          .build();
+    static EgressSpec<OutboundDriverMessage> TO_DRIVER_SPEC =
+        KafkaEgressBuilder.forIdentifier(Identifiers.TO_OUTBOUND_DRIVER)
+            .withKafkaAddress(KAFKA_SERVER)
+            .withSerializer(ToDriverSerializer.class)
+            .build();
 
-  private static final class FromDriverDeserializer
-      implements KafkaIngressDeserializer<InboundDriverMessage> {
+    private static final class FromDriverDeserializer
+        implements KafkaIngressDeserializer<InboundDriverMessage> {
 
-    private static final long serialVersionUID = 1;
+        private static final long serialVersionUID = 1;
 
-    @Override
-    public InboundDriverMessage deserialize(ConsumerRecord<byte[], byte[]> input) {
-      try {
-        return InboundDriverMessage.parseFrom(input.value());
-      } catch (InvalidProtocolBufferException ex) {
-        throw new RuntimeException(ex);
-      }
+        @Override
+        public InboundDriverMessage deserialize(ConsumerRecord<byte[], byte[]> input) {
+            try {
+                return InboundDriverMessage.parseFrom(input.value());
+            } catch (InvalidProtocolBufferException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
-  }
 
-  private static final class FromPassengersDeserializer
-      implements KafkaIngressDeserializer<InboundPassengerMessage> {
+    private static final class FromPassengersDeserializer
+        implements KafkaIngressDeserializer<InboundPassengerMessage> {
 
-    private static final long serialVersionUID = 1;
+        private static final long serialVersionUID = 1;
 
-    @Override
-    public InboundPassengerMessage deserialize(ConsumerRecord<byte[], byte[]> input) {
-      try {
-        return InboundPassengerMessage.parseFrom(input.value());
-      } catch (InvalidProtocolBufferException ex) {
-        throw new RuntimeException(ex);
-      }
+        @Override
+        public InboundPassengerMessage deserialize(ConsumerRecord<byte[], byte[]> input) {
+            try {
+                return InboundPassengerMessage.parseFrom(input.value());
+            } catch (InvalidProtocolBufferException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
-  }
 
-  private static final class ToPassengersSerializer
-      implements KafkaEgressSerializer<OutboundPassengerMessage> {
+    private static final class ToPassengersSerializer
+        implements KafkaEgressSerializer<OutboundPassengerMessage> {
 
-    private static final long serialVersionUID = 1;
+        private static final long serialVersionUID = 1;
 
-    @Override
-    public ProducerRecord<byte[], byte[]> serialize(OutboundPassengerMessage message) {
-      byte[] key = message.getPassengerId().getBytes(StandardCharsets.UTF_8);
-      byte[] value = message.toByteArray();
-      return new ProducerRecord<>(TO_PASSENGER_KAFKA_TOPIC_NAME, key, value);
+        @Override
+        public ProducerRecord<byte[], byte[]> serialize(OutboundPassengerMessage message) {
+            byte[] key = message.getPassengerId().getBytes(StandardCharsets.UTF_8);
+            byte[] value = message.toByteArray();
+            return new ProducerRecord<>(TO_PASSENGER_KAFKA_TOPIC_NAME, key, value);
+        }
     }
-  }
 
-  private static final class ToDriverSerializer
-      implements KafkaEgressSerializer<OutboundDriverMessage> {
+    private static final class ToDriverSerializer
+        implements KafkaEgressSerializer<OutboundDriverMessage> {
 
-    private static final long serialVersionUID = 1;
+        private static final long serialVersionUID = 1;
 
-    @Override
-    public ProducerRecord<byte[], byte[]> serialize(OutboundDriverMessage message) {
-      byte[] key = message.getDriverId().getBytes(StandardCharsets.UTF_8);
-      byte[] value = message.toByteArray();
-      return new ProducerRecord<>(TO_DRIVER_TOPIC_NAME, key, value);
+        @Override
+        public ProducerRecord<byte[], byte[]> serialize(OutboundDriverMessage message) {
+            byte[] key = message.getDriverId().getBytes(StandardCharsets.UTF_8);
+            byte[] value = message.toByteArray();
+            return new ProducerRecord<>(TO_DRIVER_TOPIC_NAME, key, value);
+        }
     }
-  }
 }
