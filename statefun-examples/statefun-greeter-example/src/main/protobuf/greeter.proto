@@ -23,17 +23,11 @@ option java_multiple_files = true;
 
 message GreetRequest {
     string who = 1;
-    string action = 2;
 }
 
 message GreetResponse {
     string who = 1;
     string greeting = 2;
-}
-
-message CustomerRequest {
-    string who = 1;
-    string action = 2;
 }
 
 

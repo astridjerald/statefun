@@ -17,12 +17,10 @@
  */
 package org.apache.flink.statefun.examples.greeter;
 
-import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.apache.flink.statefun.examples.greeter.generated.GreetRequest;
 import org.apache.flink.statefun.examples.greeter.generated.GreetResponse;
-import org.apache.flink.statefun.examples.greeter.generated.CustomerRequest;
 import org.apache.flink.statefun.sdk.io.EgressIdentifier;
 import org.apache.flink.statefun.sdk.io.EgressSpec;
 import org.apache.flink.statefun.sdk.io.IngressIdentifier;
@@ -44,21 +42,18 @@ import org.apache.kafka.clients.producer.ProducerRecord;
  * identifiers without depending on specific implementations.
  */
 final class GreetingIO {
+
   static final IngressIdentifier<GreetRequest> GREETING_INGRESS_ID =
       new IngressIdentifier<>(GreetRequest.class, "apache", "greet-ingress");
 
   static final EgressIdentifier<GreetResponse> GREETING_EGRESS_ID =
       new EgressIdentifier<>("apache", "kafka-greeting-output", GreetResponse.class);
 
-  static final IngressIdentifier<CustomerRequest> CUSTOMER_INGRESS_ID =
-          new IngressIdentifier<>(CustomerRequest.class, "apache", "customer-ingress");
-
   private final String kafkaAddress;
 
   GreetingIO(String kafkaAddress) {
     this.kafkaAddress = Objects.requireNonNull(kafkaAddress);
   }
-
 
   IngressSpec<GreetRequest> getIngressSpec() {
     return KafkaIngressBuilder.forIdentifier(GREETING_INGRESS_ID)
@@ -69,22 +64,12 @@ final class GreetingIO {
         .build();
   }
 
-  IngressSpec<CustomerRequest> getCustomerIngressSpec() {
-    return KafkaIngressBuilder.forIdentifier(CUSTOMER_INGRESS_ID)
-            .withKafkaAddress(kafkaAddress)
-            .withTopic("customer")
-            .withDeserializer(CustomerKafkaDeserializer.class)
-            .withProperty(ConsumerConfig.GROUP_ID_CONFIG, "greetings")
-            .build();
-  }
-
   EgressSpec<GreetResponse> getEgressSpec() {
     return KafkaEgressBuilder.forIdentifier(GREETING_EGRESS_ID)
         .withKafkaAddress(kafkaAddress)
         .withSerializer(GreetKafkaSerializer.class)
         .build();
   }
-
 
   private static final class GreetKafkaDeserializer
       implements KafkaIngressDeserializer<GreetRequest> {
@@ -93,26 +78,11 @@ final class GreetingIO {
 
     @Override
     public GreetRequest deserialize(ConsumerRecord<byte[], byte[]> input) {
-      String[] data = new String(input.value(), StandardCharsets.UTF_8).split(" ");
-      String who = data[0];
-      String action = data[1];
-      return GreetRequest.newBuilder().setWho(who).setAction(action).build();
+      String who = new String(input.value(), StandardCharsets.UTF_8);
+
+      return GreetRequest.newBuilder().setWho(who).build();
     }
   }
-
-  private static final class CustomerKafkaDeserializer
-      implements KafkaIngressDeserializer<CustomerRequest> {
-action).build();
-    }
-  }
-  private static final long serialVersionUID = 1L;
-
-  @Override
-  public CustomerRequest deserialize(ConsumerRecord<byte[], byte[]> input) {
-    String[] data = new String(input.value(), StandardCharsets.UTF_8).split(" ");
-    String who = data[0];
-    String action = data[1];
-    return CustomerRequest.newBuilder().setWho(who).setAction()
 
   private static final class GreetKafkaSerializer implements KafkaEgressSerializer<GreetResponse> {
 

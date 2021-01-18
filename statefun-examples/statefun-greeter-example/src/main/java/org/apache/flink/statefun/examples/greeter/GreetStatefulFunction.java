@@ -57,43 +57,27 @@ final class GreetStatefulFunction implements StatefulFunction {
   }
 
   private GreetResponse computePersonalizedGreeting(GreetRequest greetMessage) {
-
     final String name = greetMessage.getWho();
-    final String action = greetMessage.getAction();
     final int seen = seenCount.getOrDefault(0);
-    String greeting = "";
-    if (action.equals("add")){
-      if (seen < 4){
-        seenCount.set(seen + 1);
-      }
-      greeting = greetAddition(name, seen);
-    }
-    else if (action.equals("remove")){
-      if (seen > 0){
-        seenCount.set(seen - 1);
-      }
-      greeting = greetRemoval(name, seen);
-    }
+    seenCount.set(seen + 1);
+
+    String greeting = greetText(name, seen);
 
     return GreetResponse.newBuilder().setWho(name).setGreeting(greeting).build();
   }
 
-  private static String greetRemoval(String name, int seen) {
-    if (seen <= 0) {
-      return String.format("Item %s cannot be removed! Count is %d(empty) ! \uD83D\uDE32", name, seen);
-    }
-    return String.format("Count of Item %s decreased in inventory. Current count is %d !\uD83D\uDE4C", name, seen - 1);
-  }
-
-  private static String greetAddition(String name, int seen) {
+  private static String greetText(String name, int seen) {
     switch (seen) {
       case 0:
+        return String.format("Hello %s ! \uD83D\uDE0E", name);
       case 1:
+        return String.format("Hello again %s ! \uD83E\uDD17", name);
       case 2:
+        return String.format("Third time is a charm! %s! \uD83E\uDD73", name);
       case 3:
-        return String.format("Count of Item %s increased in inventory. Current count is %d ! \uD83D\uDE32", name, seen + 1);
+        return String.format("Happy to see you once again %s ! \uD83D\uDE32", name);
       default:
-        return String.format("Max capacity(%d) reached for %s.\uD83D\uDE4C", seen, name);
+        return String.format("Hello at the %d-th time %s \uD83D\uDE4C", seen + 1, name);
     }
   }
 }

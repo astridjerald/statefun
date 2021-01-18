@@ -24,34 +24,22 @@ import org.apache.flink.statefun.sdk.StatefulFunction;
 import org.apache.flink.statefun.sdk.annotations.Persisted;
 import org.apache.flink.statefun.sdk.state.PersistedValue;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-import java.util.logging.FileHandler;
 
 final class Inventory implements StatefulFunction {
   static final FunctionType TYPE = new FunctionType(Identifiers.NAMESPACE, "inventory");
-
-  private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   @Persisted
   private final PersistedValue<Integer> inventory = PersistedValue.of("inventory", Integer.class);
 
   @Override
   public void invoke(Context context, Object message) {
-    FileHandler fileTxt = null;
-    try {
-      fileTxt = new FileHandler("Logging.txt");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    LOGGER.addHandler(fileTxt);
     if (message instanceof ProtobufMessages.RestockItem) {
 
       int quantity =
           inventory.getOrDefault(0) + ((ProtobufMessages.RestockItem) message).getQuantity();
       inventory.set(quantity);
-      System.out.println(String.format("Inventory: within restock item: message and value: %s %d", ((ProtobufMessages.RestockItem) message).toString(), inventory.get()));
+      System.out.println(String.format("%s restocked to %d units", context.self().id(), inventory.get()));
+      System.out.println("***************************************************************");
     } else if (message instanceof ProtobufMessages.RequestItem) {
       int quantity = inventory.getOrDefault(0);
       int requestedAmount = ((ProtobufMessages.RequestItem) message).getQuantity();
@@ -62,10 +50,15 @@ final class Inventory implements StatefulFunction {
       if (quantity >= requestedAmount) {
         inventory.set(quantity - requestedAmount);
         availability.setStatus(ProtobufMessages.ItemAvailability.Status.INSTOCK);
+        System.out.println(String.format("%s added to cart and decreased to %d units within inventory", context.self().id(), inventory.get()));
+
       } else {
         availability.setStatus(ProtobufMessages.ItemAvailability.Status.OUTOFSTOCK);
+        System.out.println(String.format("%s out of stock!", context.self().id()));
+
       }
-      System.out.println(String.format("Inventory: within request item: message and value: %s %d", ((ProtobufMessages.RequestItem) message).toString(), inventory.get()));
+      System.out.println("***************************************************************");
+
       context.send(context.caller(), availability.build());
     }
   }

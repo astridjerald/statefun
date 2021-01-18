@@ -40,12 +40,10 @@ public final class GreetingModule implements StatefulFunctionModule {
     // pull the configured kafka broker address, or default if none was passed.
     String kafkaAddress = globalConfiguration.getOrDefault(KAFKA_KEY, DEFAULT_KAFKA_ADDRESS);
     GreetingIO ioModule = new GreetingIO(kafkaAddress);
+
     // bind an ingress to the system along with the router
     binder.bindIngress(ioModule.getIngressSpec());
     binder.bindIngressRouter(GreetingIO.GREETING_INGRESS_ID, new GreetRouter());
-
-    binder.bindIngress(ioModule.getCustomerIngressSpec());
-    binder.bindIngressRouter(GreetingIO.CUSTOMER_INGRESS_ID, new GreetRouter());
 
     // bind an egress to the system
     binder.bindEgress(ioModule.getEgressSpec());
